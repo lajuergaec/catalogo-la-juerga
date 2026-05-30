@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>La Juerga — Catálogo de Canciones</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --paper:#FAFAF7;
+  --ink:#0B0B0B;
+  --ink-70:rgba(11,11,11,.62);
+  --ink-40:rgba(11,11,11,.40);
+  --ink-15:rgba(11,11,11,.14);
+  --ink-08:rgba(11,11,11,.075);
+  --hair:rgba(11,11,11,.16);
+  --sel-bg:#0B0B0B;
+  --sel-fg:#FAFAF7;
+  --shadow:rgba(11,11,11,.13);
+}
+html[data-theme="dark"]{
+  --paper:#0B0B0B;
+  --ink:#F4F3EE;
+  --ink-70:rgba(244,243,238,.64);
+  --ink-40:rgba(244,243,238,.42);
+  --ink-15:rgba(244,243,238,.16);
+  --ink-08:rgba(244,243,238,.08);
+  --hair:rgba(244,243,238,.18);
+  --sel-bg:#F4F3EE;
+  --sel-fg:#0B0B0B;
+  --shadow:rgba(0,0,0,.5);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{background:var(--ink-08);}
+html[data-theme="dark"] body{background:#000;}
+body{
+  font-family:'Archivo',-apple-system,sans-serif;
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+.mono{font-family:'Space Mono',monospace;}
+
+/* TOPBAR */
+.topbar{
+  position:fixed;top:0;left:0;right:0;z-index:60;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 22px;
+  background:color-mix(in srgb, var(--paper) 86%, transparent);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--hair);
+}
+.tb-mark{height:15px;display:block;overflow:hidden;}
+.tb-mark svg{height:100%;width:auto;display:block;}
+.mk-dark{display:none;}
+html[data-theme="dark"] .mk-light{display:none;}
+html[data-theme="dark"] .mk-dark{display:block;}
+.tb-right{display:flex;align-items:center;gap:10px;}
+.tb-btn{
+  font-family:'Space Mono',monospace;font-size:10.5px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink);
+  background:transparent;border:1px solid var(--hair);
+  padding:8px 12px;border-radius:999px;cursor:pointer;
+  display:inline-flex;align-items:center;gap:7px;transition:.18s;
+}
+.tb-btn:hover{background:var(--ink);color:var(--paper);border-color:var(--ink);}
+.theme-toggle .dot{width:8px;height:8px;border-radius:50%;background:var(--ink);}
+.theme-toggle:hover .dot{background:var(--paper);}
+
+/* SHEET */
+.doc{
+  max-width:860px;margin:0 auto;padding:0 0 220px;
+  background:var(--paper);
+  box-shadow:0 1px 0 var(--hair), 0 40px 90px -50px var(--shadow);
+  min-height:100vh;
+}
+.pad{padding-left:64px;padding-right:64px;}
+@media(max-width:680px){
+  .pad{padding-left:26px;padding-right:26px;}
+  .cover{padding:84px 26px 56px!important;}
+  .cover-rule{margin:0!important;}
+  .how,.index,.genre,.setpage,.foot{padding-left:26px!important;padding-right:26px!important;}
+}
+
+/* COVER */
+.cover{
+  min-height:100vh;padding:84px 64px 56px;
+  display:flex;flex-direction:column;justify-content:space-between;
+  position:relative;overflow:hidden;
+}
+.cover-top{display:flex;justify-content:space-between;align-items:flex-start;
+  font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-70);}
+.cover-top .r{text-align:right;line-height:1.7;}
+.cover-mid{display:flex;flex-direction:column;gap:30px;align-items:flex-start;}
+.cover-mark{width:min(560px,82%);}
+.cover-mark svg{width:100%;height:auto;display:block;}
+.cover-kicker{
+  font-size:12px;letter-spacing:.34em;text-transform:uppercase;color:var(--ink-70);
+  padding-bottom:14px;border-bottom:1px solid var(--hair);width:min(560px,82%);
+}
+.cover-title{
+  font-weight:900;line-height:.9;letter-spacing:-.02em;text-transform:uppercase;
+  font-size:clamp(46px,9vw,104px);
+}
+.cover-title em{font-style:normal;display:block;color:var(--ink-40);}
+.cover-bottom{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;
+  font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-70);line-height:1.9;}
+.cover-bottom .stat b{display:block;font-family:'Archivo';font-weight:900;font-size:34px;
+  letter-spacing:-.02em;color:var(--ink);}
+.cover-rule{height:1px;background:var(--hair);margin:0 64px;}
+
+/* HOW */
+.how{padding:64px 64px 8px;}
+.section-eyebrow{
+  display:flex;align-items:center;gap:14px;margin-bottom:30px;
+  font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--ink-70);
+}
+.section-eyebrow::after{content:"";flex:1;height:1px;background:var(--hair);}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--hair);
+  border:1px solid var(--hair);}
+@media(max-width:540px){.steps{grid-template-columns:1fr;}}
+.step{background:var(--paper);padding:26px 22px 30px;}
+.step .n{font-family:'Space Mono';font-size:12px;color:var(--ink-40);letter-spacing:.1em;}
+.step h4{font-weight:800;font-size:20px;letter-spacing:-.01em;margin:14px 0 8px;text-transform:uppercase;}
+.step p{font-size:13.5px;line-height:1.55;color:var(--ink-70);}
+
+/* INDEX */
+.index{padding:46px 64px 60px;}
+.idx-list{margin-top:6px;}
+.idx-row{
+  display:flex;align-items:baseline;gap:16px;padding:15px 0;
+  border-bottom:1px solid var(--hair);cursor:pointer;text-decoration:none;color:inherit;
+}
+.idx-row:first-child{border-top:1px solid var(--hair);}
+.idx-row .ix{font-family:'Space Mono';font-size:12px;color:var(--ink-40);width:34px;flex-shrink:0;}
+.idx-row .nm{font-weight:800;font-size:clamp(22px,3.4vw,34px);letter-spacing:-.02em;
+  text-transform:uppercase;flex:1;transition:.18s;}
+.idx-row:hover .nm{padding-left:10px;}
+.idx-row .ct{font-family:'Space Mono';font-size:12px;color:var(--ink-70);white-space:nowrap;}
+.idx-dotfill{flex:1;border-bottom:1px dotted var(--ink-15);transform:translateY(-4px);min-width:10px;}
+
+/* GENRE SECTION */
+.genre{padding:56px 64px 10px;break-inside:avoid;}
+.genre-head{margin-bottom:22px;}
+.genre-meta{display:flex;align-items:center;gap:14px;
+  font-family:'Space Mono';font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink-70);margin-bottom:8px;}
+.genre-meta::after{content:"";flex:1;height:1px;background:var(--hair);}
+.genre-blurb{font-size:13.5px;color:var(--ink-40);margin-top:8px;letter-spacing:.01em;}
+.genre-title{font-weight:900;font-size:clamp(38px,7vw,78px);line-height:.92;
+  letter-spacing:-.03em;text-transform:uppercase;}
+
+/* TRACK ROW */
+.track{
+  display:grid;grid-template-columns:42px 1fr auto 34px;align-items:center;gap:18px;
+  padding:13px 14px 13px 10px;border-bottom:1px solid var(--hair);
+  cursor:pointer;position:relative;transition:background .14s,color .14s;
+  margin:0 -14px 0 -10px;
+}
+@media(max-width:540px){
+  .track{grid-template-columns:32px 1fr 28px;gap:10px;}
+  .t-tag{display:none!important;}
+}
+.track:hover{background:var(--ink-08);}
+.track .t-num{font-family:'Space Mono';font-size:13px;color:var(--ink-40);text-align:left;}
+.track .t-main{min-width:0;}
+.track .t-title{font-weight:700;font-size:17.5px;letter-spacing:-.01em;line-height:1.15;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.track .t-artist{font-size:13px;color:var(--ink-70);margin-top:2px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.track .t-tag{font-family:'Space Mono';font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink-70);border:1px solid var(--hair);padding:4px 9px;border-radius:999px;white-space:nowrap;}
+.track .t-box{width:22px;height:22px;border:1.5px solid var(--ink-40);border-radius:5px;
+  display:flex;align-items:center;justify-content:center;transition:.16s;justify-self:end;}
+.track .t-box svg{width:13px;height:13px;opacity:0;transform:scale(.5);transition:.16s;}
+.track:hover .t-box{border-color:var(--ink);}
+.track.sel{background:var(--sel-bg);color:var(--sel-fg);}
+.track.sel .t-num,.track.sel .t-artist{color:color-mix(in srgb,var(--sel-fg) 66%,transparent);}
+.track.sel .t-tag{color:var(--sel-fg);border-color:color-mix(in srgb,var(--sel-fg) 40%,transparent);}
+.track.sel .t-box{background:var(--sel-fg);border-color:var(--sel-fg);}
+.track.sel .t-box svg{opacity:1;transform:scale(1);stroke:var(--sel-bg);}
+
+/* SETLIST PAGE */
+.setpage{padding:62px 64px 30px;}
+.set-empty{font-size:14px;color:var(--ink-70);line-height:1.6;border:1px dashed var(--hair);
+  padding:30px;text-align:center;}
+.set-list .track{cursor:default;}
+.set-foot{margin-top:30px;padding-top:22px;border-top:2px solid var(--ink);
+  display:flex;justify-content:space-between;align-items:flex-end;gap:20px;}
+.set-foot .lbl{font-family:'Space Mono';font-size:11px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--ink-70);}
+.set-foot .big{font-weight:900;font-size:48px;letter-spacing:-.03em;line-height:1;}
+.sign{margin-top:46px;display:grid;grid-template-columns:1fr 1fr;gap:40px;}
+.sign .field{border-bottom:1px solid var(--ink);padding-bottom:8px;}
+.sign .field span{font-family:'Space Mono';font-size:10.5px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink-70);}
+
+/* DOCK */
+.dock{
+  position:fixed;left:50%;transform:translateX(-50%);bottom:22px;z-index:70;
+  width:min(820px,calc(100% - 40px));
+  background:var(--ink);color:var(--paper);
+  border-radius:16px;box-shadow:0 22px 50px -18px rgba(0,0,0,.6);
+  display:flex;align-items:center;gap:16px;padding:14px 16px 14px 22px;
+  transition:transform .3s cubic-bezier(.2,.7,.2,1),opacity .3s;
+}
+.dock .d-count{display:flex;align-items:baseline;gap:9px;}
+.dock .d-count b{font-weight:900;font-size:26px;letter-spacing:-.02em;line-height:1;}
+.dock .d-count span{font-family:'Space Mono';font-size:10px;letter-spacing:.14em;
+  text-transform:uppercase;color:color-mix(in srgb,var(--paper) 62%,transparent);}
+.dock .d-bar{flex:1;height:4px;background:color-mix(in srgb,var(--paper) 22%,transparent);
+  border-radius:99px;overflow:hidden;}
+.dock .d-bar i{display:block;height:100%;width:0;background:var(--paper);transition:width .3s;}
+.dock-actions{display:flex;gap:8px;}
+.d-btn{font-family:'Space Mono';font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+  border:1px solid color-mix(in srgb,var(--paper) 30%,transparent);background:transparent;
+  color:var(--paper);padding:10px 13px;border-radius:9px;cursor:pointer;transition:.16s;white-space:nowrap;}
+.d-btn:hover{background:var(--paper);color:var(--ink);border-color:var(--paper);}
+.d-btn.solid{background:var(--paper);color:var(--ink);border-color:var(--paper);}
+.d-btn.solid:hover{opacity:.82;}
+.d-btn:disabled{opacity:.4;cursor:not-allowed;}
+.dock.hidden{transform:translateX(-50%) translateY(140%);opacity:0;pointer-events:none;}
+@media(max-width:480px){
+  .d-btn:not(.solid){display:none;}
+  .dock{gap:10px;padding:12px;}
+}
+
+/* MODAL */
+.modal-bg{position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.55);
+  backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:20px;}
+.modal-bg.open{display:flex;}
+.modal{background:var(--paper);color:var(--ink);width:min(460px,100%);border-radius:16px;
+  padding:30px 28px;box-shadow:0 30px 70px -20px rgba(0,0,0,.6);}
+.modal h3{font-weight:900;font-size:26px;letter-spacing:-.02em;text-transform:uppercase;}
+.modal .sub{font-size:13px;color:var(--ink-70);margin:8px 0 22px;line-height:1.5;}
+.modal-actions{display:flex;flex-direction:column;gap:10px;}
+.m-act{display:flex;align-items:center;gap:13px;text-align:left;width:100%;
+  border:1px solid var(--hair);background:transparent;color:var(--ink);
+  padding:15px 16px;border-radius:11px;cursor:pointer;transition:.16s;}
+.m-act:hover{background:var(--ink);color:var(--paper);border-color:var(--ink);}
+.m-act .ic{width:20px;height:20px;flex:none;}
+.m-act .tx{flex:1;}
+.m-act .tx b{display:block;font-weight:700;font-size:14.5px;}
+.m-act .tx small{font-family:'Space Mono';font-size:10px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink-40);}
+.m-act:hover .tx small{color:color-mix(in srgb,var(--paper) 60%,transparent);}
+.modal-close{margin-top:18px;width:100%;background:none;border:none;cursor:pointer;
+  font-family:'Space Mono';font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--ink-40);padding:8px;}
+.modal-close:hover{color:var(--ink);}
+
+.toast{position:fixed;bottom:96px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:var(--ink);color:var(--paper);font-family:'Space Mono';font-size:11px;
+  letter-spacing:.1em;text-transform:uppercase;padding:12px 20px;border-radius:99px;z-index:120;
+  opacity:0;transition:.25s;pointer-events:none;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+.foot{padding:40px 64px 60px;display:flex;justify-content:space-between;align-items:center;
+  border-top:1px solid var(--hair);margin-top:40px;
+  font-family:'Space Mono';font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-40);}
+.foot svg{height:13px;width:auto;}
+
+/* PRINT */
+@media print{
+  @page{margin:14mm;}
+  html,body{background:#fff;}
+  .topbar,.dock,.modal-bg,.toast{display:none !important;}
+  .doc{box-shadow:none;max-width:none;margin:0;padding:0;}
+  .cover{min-height:auto;padding:0 0 24mm;break-after:page;}
+  .pad,.how,.index,.genre,.setpage,.foot{padding-left:0;padding-right:0;}
+  .cover{padding-left:0;padding-right:0;}
+  .cover-rule{margin:0;}
+  .genre{break-inside:auto;}
+  .genre-head{break-after:avoid;}
+  .track{break-inside:avoid;margin:0;}
+  .track:hover{background:transparent;}
+  .setpage{break-before:page;}
+  .track.sel{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .steps{break-inside:avoid;}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="tb-mark">
+    <span class="mk-light"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 995 145"><path fill="#000000" d="M102.600 142.400L0 142.400L0 2.400L32.400 2.400L32.400 116L102.600 116L102.600 142.400ZM113.600 142.400L80.400 142.400L142.800 2.400L174.800 2.400L237.400 142.400L203.400 142.400L191.000 112.400L126.000 112.400L113.600 142.400ZM136.400 87.800L180.800 87.800L158.600 34.200L136.400 87.800ZM290.400 144.800Q276.200 144.800 264.300 139.500Q252.400 134.200 244.800 124.400L262.800 102.800Q268.600 110.400 275 114.300Q281.400 118.200 288.800 118.200Q308.600 118.200 308.600 95L308.600 28.400L259.400 28.400L259.400 2.400L340.800 2.400L340.800 93.200Q340.800 119.200 328 132Q315.200 144.800 290.400 144.800ZM413.000 144.800Q383.200 144.800 366.400 128.200Q349.600 111.600 349.600 80.800L349.600 2.400L382.000 2.400L382.000 79.600Q382.000 99.600 390.200 108.400Q398.400 117.200 413.200 117.200Q428.000 117.200 436.200 108.400Q444.400 99.600 444.400 79.600L444.400 2.400L476.400 2.400L476.400 80.800Q476.400 111.600 459.600 128.200Q442.800 144.800 413.000 144.800ZM594.800 142.400L486.400 142.400L486.400 2.400L592.200 2.400L592.200 28.400L518.600 28.400L518.600 58.800L583.600 58.800L583.600 84L518.600 84L518.600 116.400L594.800 116.400L594.800 142.400ZM631.000 142.400L598.600 142.400L598.600 2.400L658.400 2.400Q687.600 2.400 703.800 15.900Q720.000 29.400 720.000 53.200Q720.000 68.800 712.600 80.100Q705.200 91.400 691.600 97.400L722.600 142.400L687.600 142.400L660.800 103.400L631.000 103.400L631.000 142.400ZM631.000 28.800L631.000 77.600L657.400 77.600Q672.400 77.600 679.800 71.100Q687.200 64.600 687.200 53.200Q687.200 41.600 679.800 35.200Q672.400 28.800 657.400 28.800L631.000 28.800ZM791.200 144.800Q774.600 144.800 760.700 139.500Q746.800 134.200 736.500 124.400Q726.200 114.600 720.500 101.400Q714.800 88.200 714.800 72.400Q714.800 56.600 720.500 43.400Q726.200 30.200 736.600 20.400Q747.000 10.600 761.000 5.300Q775.000 0 791.800 0Q810.400 0 825.300 6.200Q840.200 12.400 850.400 24.200L829.600 43.400Q822.000 35.400 813.000 31.500Q804.000 27.600 793.400 27.600Q783.200 27.600 774.800 30.800Q766.400 34 760.300 40Q754.200 46 750.900 54.200Q747.600 62.400 747.600 72.400Q747.600 82.200 750.900 90.400Q754.200 98.600 760.300 104.700Q766.400 110.800 774.700 114Q783.000 117.200 793.000 117.200Q802.600 117.200 811.800 114Q815.000 113 818.200 111.400L818.200 70.200L847.800 70.200L847.800 127Q836.400 135.600 821.300 140.200Q806.200 144.800 791.200 144.800ZM870.600 142.400L837.400 142.400L899.800 2.400L931.800 2.400L994.400 142.400L960.400 142.400L948.000 112.400L883.000 112.400L870.600 142.400ZM893.400 87.800L937.800 87.800L915.600 34.200L893.400 87.800Z"/></svg></span>
+    <span class="mk-dark"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 995 145"><path fill="#FFFFFF" d="M102.600 142.400L0 142.400L0 2.400L32.400 2.400L32.400 116L102.600 116L102.600 142.400ZM113.600 142.400L80.400 142.400L142.800 2.400L174.800 2.400L237.400 142.400L203.400 142.400L191.000 112.400L126.000 112.400L113.600 142.400ZM136.400 87.800L180.800 87.800L158.600 34.200L136.400 87.800ZM290.400 144.800Q276.200 144.800 264.300 139.500Q252.400 134.200 244.800 124.400L262.800 102.800Q268.600 110.400 275 114.300Q281.400 118.200 288.800 118.200Q308.600 118.200 308.600 95L308.600 28.400L259.400 28.400L259.400 2.400L340.800 2.400L340.800 93.200Q340.800 119.200 328 132Q315.200 144.800 290.400 144.800ZM413.000 144.800Q383.200 144.800 366.400 128.200Q349.600 111.600 349.600 80.800L349.600 2.400L382.000 2.400L382.000 79.600Q382.000 99.600 390.200 108.400Q398.400 117.200 413.200 117.200Q428.000 117.200 436.200 108.400Q444.400 99.600 444.400 79.600L444.400 2.400L476.400 2.400L476.400 80.800Q476.400 111.600 459.600 128.200Q442.800 144.800 413.000 144.800ZM594.800 142.400L486.400 142.400L486.400 2.400L592.200 2.400L592.200 28.400L518.600 28.400L518.600 58.800L583.600 58.800L583.600 84L518.600 84L518.600 116.400L594.800 116.400L594.800 142.400ZM631.000 142.400L598.600 142.400L598.600 2.400L658.400 2.400Q687.600 2.400 703.800 15.900Q720.000 29.400 720.000 53.200Q720.000 68.800 712.600 80.100Q705.200 91.400 691.600 97.400L722.600 142.400L687.600 142.400L660.800 103.400L631.000 103.400L631.000 142.400ZM631.000 28.800L631.000 77.600L657.400 77.600Q672.400 77.600 679.800 71.100Q687.200 64.600 687.200 53.200Q687.200 41.600 679.800 35.200Q672.400 28.800 657.400 28.800L631.000 28.800ZM791.200 144.800Q774.600 144.800 760.700 139.500Q746.800 134.200 736.500 124.400Q726.200 114.600 720.500 101.400Q714.800 88.200 714.800 72.400Q714.800 56.600 720.500 43.400Q726.200 30.200 736.600 20.400Q747.000 10.600 761.000 5.300Q775.000 0 791.800 0Q810.400 0 825.300 6.200Q840.200 12.400 850.400 24.200L829.600 43.400Q822.000 35.400 813.000 31.500Q804.000 27.600 793.400 27.600Q783.200 27.600 774.800 30.800Q766.400 34 760.300 40Q754.200 46 750.900 54.200Q747.600 62.400 747.600 72.400Q747.600 82.200 750.900 90.400Q754.200 98.600 760.300 104.700Q766.400 110.800 774.700 114Q783.000 117.200 793.000 117.200Q802.600 117.200 811.800 114Q815.000 113 818.200 111.400L818.200 70.200L847.800 70.200L847.800 127Q836.400 135.600 821.300 140.200Q806.200 144.800 791.200 144.800ZM870.600 142.400L837.400 142.400L899.800 2.400L931.800 2.400L994.400 142.400L960.400 142.400L948.000 112.400L883.000 112.400L870.600 142.400ZM893.400 87.800L937.800 87.800L915.600 34.200L893.400 87.800Z"/></svg></span>
+  </div>
+  <div class="tb-right">
+    <button class="tb-btn theme-toggle" id="themeBtn"><span class="dot"></span><span id="themeLabel">Fondo negro</span></button>
+    <button class="tb-btn" id="printBtn">Imprimir / PDF</button>
+  </div>
+</div>
+
+<div class="doc" id="doc"></div>
+
+<div class="dock hidden" id="dock">
+  <div class="d-count"><b id="dCount">0</b><span>temas<br>elegidos</span></div>
+  <div class="d-bar"><i id="dBar"></i></div>
+  <div class="dock-actions">
+    <button class="d-btn" id="dClear">Limpiar</button>
+    <button class="d-btn" id="dView">Ver setlist</button>
+    <button class="d-btn solid" id="dSend">Enviar ▸</button>
+  </div>
+</div>
+
+<div class="modal-bg" id="modal">
+  <div class="modal">
+    <h3>Envía tu setlist</h3>
+    <p class="sub">Tu selección de <b id="mCount">0</b> canciones está lista. Mándanosla y la afinamos para tu evento.</p>
+    <div class="modal-actions">
+      <button class="m-act" id="mWa">
+        <svg class="ic" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15l-1.4 5 5.1-1.3A10 10 0 1 0 12 2Zm5.3 14.1c-.2.6-1.2 1.1-1.7 1.2-.4 0-.9.2-3-.6-2.5-1-4.1-3.6-4.2-3.7-.1-.2-1-1.3-1-2.5s.6-1.8.9-2c.2-.3.5-.3.6-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.1.1.3 0 .5l-.4.5-.3.3c-.1.2-.3.3-.1.6.1.3.7 1.1 1.4 1.7.9.8 1.7 1.1 2 1.2.2.1.4.1.5-.1l.6-.8c.2-.2.4-.2.6-.1l1.9.9c.3.1.4.2.5.3 0 .2 0 .8-.2 1.4Z"/></svg>
+        <span class="tx"><b>WhatsApp</b><small>Abrir chat con La Juerga</small></span>
+      </button>
+      <button class="m-act" id="mCopy">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+        <span class="tx"><b>Copiar lista</b><small>Pégala donde quieras</small></span>
+      </button>
+      <button class="m-act" id="mPrint">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-2M6 14h12v7H6z"/></svg>
+        <span class="tx"><b>Guardar PDF / imprimir</b><small>Setlist con tu selección</small></span>
+      </button>
+    </div>
+    <button class="modal-close" id="mClose">Cerrar</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ====== CONFIG — PON TU NÚMERO ACÁ ====== */
+// Con código de país, sin + ni espacios. Ej: "593989881600" (Ecuador)
+var BAND_PHONE = "593989881600";
+
+/* ====== DATA ====== */
+const GENRES = [
+  { key:"cumbia",    name:"Cumbia",                  blurb:"El piso de la pista. Lo que no falla." },
+  { key:"reggaeton", name:"Reguetón",                blurb:"Perreo, hits del momento y clásicos." },
+  { key:"merengue",  name:"Merengue & Merenguetón",  blurb:"Pies que no paran. Pura velocidad." },
+  { key:"tropical",  name:"Tropical & Vallenato",    blurb:"Sabor caribe, acordeón y bandera arriba." },
+  { key:"pop",       name:"Pop Latino",              blurb:"Para cantar a todo pulmón." },
+  { key:"rock",      name:"Rock Latino",             blurb:"Fiesta con guitarra y actitud." },
+  { key:"salsa",     name:"Salsa",                   blurb:"Vuelta, sabor y mucha clave." },
+];
+
+// [género, canción, artista, subgénero]
+const SONGS = [
+  // CUMBIA
+  ["cumbia","La Negra Tomasa","Caifanes","Cumbia"],
+  ["cumbia","Si Una Vez","Selena","Cumbia"],
+  ["cumbia","Amor Prohibido","Selena","Cumbia"],
+  ["cumbia","Corazón","Auténticos Decadentes","Cumbia"],
+  ["cumbia","La Pregunta","Ke Personajes","Cumbia Reggae"],
+  ["cumbia","Te Vas","Américo","Cumbia"],
+  ["cumbia","Embrujo","Américo","Cumbia"],
+  ["cumbia","Que Levante La Mano","Américo","Cumbia"],
+  ["cumbia","Que Nadie Sepa Mi Sufrir","La Sonora Dinamita","Cumbia"],
+  ["cumbia","Que Bello","La Sonora Dinamita","Cumbia"],
+  ["cumbia","Nunca Es Suficiente","Los Ángeles Azules / N. Lafourcade","Cumbia"],
+  ["cumbia","La Camisa Negra","Juanes","Cumbia"],
+  ["cumbia","El Aguajal","Cruks en Karnak","Cumbia Rock"],
+  // REGGAETÓN
+  ["reggaeton","Si Antes Te Hubiera Conocido","KAROL G","Reguetón"],
+  ["reggaeton","Niña Bonita","Chino & Nacho","Reggaetón"],
+  ["reggaeton","La Plena","W Sound / Jhay Cortez","Reguetón"],
+  ["reggaeton","Báilame","Nacho","Reguetón"],
+  ["reggaeton","Dura","Daddy Yankee","Reguetón"],
+  ["reggaeton","Todavía","La Factoria","Reguetón"],
+  ["reggaeton","La Villa","Ryan Castro / Kapo","Reguetón"],
+  ["reggaeton","Dile","Don Omar","Reguetón"],
+  ["reggaeton","Chica Ideal","Latin Dreams","Reguetón"],
+  // MERENGUE
+  ["merengue","Capaz","Alleh & Yorghaki","Merenguetón"],
+  ["merengue","La Bomba","Azul Azul","Merengue"],
+  ["merengue","El Merengue","Marshmello / Manuel Turizo","Merengue"],
+  ["merengue","Muchacha Triste","Los Fantasmas del Caribe","Tecno Merengue"],
+  ["merengue","Eres Mi Sueño","Fonseca","Merengue"],
+  ["merengue","Vale La Pena","Juan Luis Guerra","Merengue"],
+  ["merengue","Las Avispas","Juan Luis Guerra","Merengue"],
+  ["merengue","La Bilirrubina","Juan Luis Guerra","Merengue"],
+  // TROPICAL
+  ["tropical","Ella Es Mi Fiesta","Carlos Vives","Tropical"],
+  ["tropical","Pa' Mayté","Carlos Vives","Tropical"],
+  ["tropical","Materialista","Silvestre Dangond","Vallenato Pop"],
+  ["tropical","Inglés en Miami","Rawayana / Manuel Turizo","Pop/Tropical"],
+  ["tropical","Chévere","ARIA VEGA","Pop Caribeño"],
+  // POP LATINO
+  ["pop","Vagabundo","Sebastián Yatra","Pop Latino"],
+  ["pop","Me Rehúso","Danny Ocean","Pop Latino"],
+  ["pop","A Quién Le Importa","Thalía","Pop Latino"],
+  ["pop","Es Mejor Así","Cristian Castro","Pop Latino"],
+  // ROCK LATINO
+  ["rock","Baracunatana","Aterciopelados","Rock Latino"],
+  ["rock","Murguero","Los Auténticos Decadentes","Murga/Rock"],
+  ["rock","La Guitarra","Los Auténticos Decadentes","Rock Latino"],
+  // SALSA
+  ["salsa","Baile Inolvidable","Bad Bunny","Salsa"],
+];
+
+/* ====== STATE ====== */
+let selected = new Set();
+
+const slug = s => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-");
+const songId = s => slug(s[2])+"--"+slug(s[1]);
+const CHECK = `<svg viewBox="0 0 24 24" fill="none" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>`;
+const total = SONGS.length;
+
+/* ====== LOGO SVGs inline ====== */
+const LOGO_NEGRO = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 995 145"><path fill="#000000" d="M102.600 142.400L0 142.400L0 2.400L32.400 2.400L32.400 116L102.600 116L102.600 142.400ZM113.600 142.400L80.400 142.400L142.800 2.400L174.800 2.400L237.400 142.400L203.400 142.400L191.000 112.400L126.000 112.400L113.600 142.400ZM136.400 87.800L180.800 87.800L158.600 34.200L136.400 87.800ZM290.400 144.800Q276.200 144.800 264.300 139.500Q252.400 134.200 244.800 124.400L262.800 102.800Q268.600 110.400 275 114.300Q281.400 118.200 288.800 118.200Q308.600 118.200 308.600 95L308.600 28.400L259.400 28.400L259.400 2.400L340.800 2.400L340.800 93.200Q340.800 119.200 328 132Q315.200 144.800 290.400 144.800ZM413.000 144.800Q383.200 144.800 366.400 128.200Q349.600 111.600 349.600 80.800L349.600 2.400L382.000 2.400L382.000 79.600Q382.000 99.600 390.200 108.400Q398.400 117.200 413.200 117.200Q428.000 117.200 436.200 108.400Q444.400 99.600 444.400 79.600L444.400 2.400L476.400 2.400L476.400 80.800Q476.400 111.600 459.600 128.200Q442.800 144.800 413.000 144.800ZM594.800 142.400L486.400 142.400L486.400 2.400L592.200 2.400L592.200 28.400L518.600 28.400L518.600 58.800L583.600 58.800L583.600 84L518.600 84L518.600 116.400L594.800 116.400L594.800 142.400ZM631.000 142.400L598.600 142.400L598.600 2.400L658.400 2.400Q687.600 2.400 703.800 15.900Q720.000 29.400 720.000 53.200Q720.000 68.800 712.600 80.100Q705.200 91.400 691.600 97.400L722.600 142.400L687.600 142.400L660.800 103.400L631.000 103.400L631.000 142.400ZM631.000 28.800L631.000 77.600L657.400 77.600Q672.400 77.600 679.800 71.100Q687.200 64.600 687.200 53.200Q687.200 41.600 679.800 35.200Q672.400 28.800 657.400 28.800L631.000 28.800ZM791.200 144.800Q774.600 144.800 760.700 139.500Q746.800 134.200 736.500 124.400Q726.200 114.600 720.500 101.400Q714.800 88.200 714.800 72.400Q714.800 56.600 720.500 43.400Q726.200 30.200 736.600 20.400Q747.000 10.600 761.000 5.300Q775.000 0 791.800 0Q810.400 0 825.300 6.200Q840.200 12.400 850.400 24.200L829.600 43.400Q822.000 35.400 813.000 31.500Q804.000 27.600 793.400 27.600Q783.200 27.600 774.800 30.800Q766.400 34 760.300 40Q754.200 46 750.900 54.200Q747.600 62.400 747.600 72.400Q747.600 82.200 750.900 90.400Q754.200 98.600 760.300 104.700Q766.400 110.800 774.700 114Q783.000 117.200 793.000 117.200Q802.600 117.200 811.800 114Q815.000 113 818.200 111.400L818.200 70.200L847.800 70.200L847.800 127Q836.400 135.600 821.300 140.200Q806.200 144.800 791.200 144.800ZM870.600 142.400L837.400 142.400L899.800 2.400L931.800 2.400L994.400 142.400L960.400 142.400L948.000 112.400L883.000 112.400L870.600 142.400ZM893.400 87.800L937.800 87.800L915.600 34.200L893.400 87.800Z"/></svg>`;
+const LOGO_BLANCO = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 995 145"><path fill="#FFFFFF" d="M102.600 142.400L0 142.400L0 2.400L32.400 2.400L32.400 116L102.600 116L102.600 142.400ZM113.600 142.400L80.400 142.400L142.800 2.400L174.800 2.400L237.400 142.400L203.400 142.400L191.000 112.400L126.000 112.400L113.600 142.400ZM136.400 87.800L180.800 87.800L158.600 34.200L136.400 87.800ZM290.400 144.800Q276.200 144.800 264.300 139.500Q252.400 134.200 244.800 124.400L262.800 102.800Q268.600 110.400 275 114.300Q281.400 118.200 288.800 118.200Q308.600 118.200 308.600 95L308.600 28.400L259.400 28.400L259.400 2.400L340.800 2.400L340.800 93.200Q340.800 119.200 328 132Q315.200 144.800 290.400 144.800ZM413.000 144.800Q383.200 144.800 366.400 128.200Q349.600 111.600 349.600 80.800L349.600 2.400L382.000 2.400L382.000 79.600Q382.000 99.600 390.200 108.400Q398.400 117.200 413.200 117.200Q428.000 117.200 436.200 108.400Q444.400 99.600 444.400 79.600L444.400 2.400L476.400 2.400L476.400 80.800Q476.400 111.600 459.600 128.200Q442.800 144.800 413.000 144.800ZM594.800 142.400L486.400 142.400L486.400 2.400L592.200 2.400L592.200 28.400L518.600 28.400L518.600 58.800L583.600 58.800L583.600 84L518.600 84L518.600 116.400L594.800 116.400L594.800 142.400ZM631.000 142.400L598.600 142.400L598.600 2.400L658.400 2.400Q687.600 2.400 703.800 15.900Q720.000 29.400 720.000 53.200Q720.000 68.800 712.600 80.100Q705.200 91.400 691.600 97.400L722.600 142.400L687.600 142.400L660.800 103.400L631.000 103.400L631.000 142.400ZM631.000 28.800L631.000 77.600L657.400 77.600Q672.400 77.600 679.800 71.100Q687.200 64.600 687.200 53.200Q687.200 41.600 679.800 35.200Q672.400 28.800 657.400 28.800L631.000 28.800ZM791.200 144.800Q774.600 144.800 760.700 139.500Q746.800 134.200 736.500 124.400Q726.200 114.600 720.500 101.400Q714.800 88.200 714.800 72.400Q714.800 56.600 720.500 43.400Q726.200 30.200 736.600 20.400Q747.000 10.600 761.000 5.300Q775.000 0 791.800 0Q810.400 0 825.300 6.200Q840.200 12.400 850.400 24.200L829.600 43.400Q822.000 35.400 813.000 31.500Q804.000 27.600 793.400 27.600Q783.200 27.600 774.800 30.800Q766.400 34 760.300 40Q754.200 46 750.900 54.200Q747.600 62.400 747.600 72.400Q747.600 82.200 750.900 90.400Q754.200 98.600 760.300 104.700Q766.400 110.800 774.700 114Q783.000 117.200 793.000 117.200Q802.600 117.200 811.800 114Q815.000 113 818.200 111.400L818.200 70.200L847.800 70.200L847.800 127Q836.400 135.600 821.300 140.200Q806.200 144.800 791.200 144.800ZM870.600 142.400L837.400 142.400L899.800 2.400L931.800 2.400L994.400 142.400L960.400 142.400L948.000 112.400L883.000 112.400L870.600 142.400ZM893.400 87.800L937.800 87.800L915.600 34.200L893.400 87.800Z"/></svg>`;
+
+/* ====== RENDER ====== */
+const doc = document.getElementById("doc");
+
+function trackRow(s, idx){
+  const id = songId(s);
+  const on = selected.has(id);
+  return `<div class="track ${on?'sel':''}" data-id="${id}" role="button" tabindex="0" aria-pressed="${on}">
+    <div class="t-num mono">${String(idx).padStart(2,"0")}</div>
+    <div class="t-main">
+      <div class="t-title">${s[1]}</div>
+      <div class="t-artist">${s[2]}</div>
+    </div>
+    <div class="t-tag mono">${s[3]}</div>
+    <div class="t-box">${CHECK}</div>
+  </div>`;
+}
+
+function build(){
+  let html = "";
+
+  /* COVER */
+  html += `<section class="cover">
+    <div class="cover-top">
+      <div>La Juerga<br>Música en vivo</div>
+      <div class="r">Catálogo · ${new Date().getFullYear()}<br>Repertorio en vivo</div>
+    </div>
+    <div class="cover-mid">
+      <div class="cover-mark mk-light">${LOGO_NEGRO}</div>
+      <div class="cover-mark mk-dark" style="display:none">${LOGO_BLANCO}</div>
+      <div class="cover-kicker">Elige las canciones para tu evento</div>
+      <div class="cover-title">Catálogo<br><em>de canciones</em></div>
+    </div>
+    <div class="cover-bottom">
+      <div class="stat"><b>${total}</b>Temas en el repertorio</div>
+      <div class="stat"><b>${GENRES.length}</b>Géneros para tu fiesta</div>
+      <div style="text-align:right">Bodas · Corporativo<br>Fiestas privadas</div>
+    </div>
+  </section>
+  <div class="cover-rule"></div>`;
+
+  /* HOW */
+  html += `<section class="how">
+    <div class="section-eyebrow mono">Cómo funciona</div>
+    <div class="steps">
+      <div class="step"><div class="n">01</div><h4>Marca</h4><p>Recorre el catálogo y toca las canciones que quieres escuchar en tu evento.</p></div>
+      <div class="step"><div class="n">02</div><h4>Arma</h4><p>Tu setlist se va guardando solo. Mira el contador abajo en cualquier momento.</p></div>
+      <div class="step"><div class="n">03</div><h4>Envía</h4><p>Mándanos tu lista por WhatsApp y la afinamos juntos para la fiesta.</p></div>
+    </div>
+  </section>`;
+
+  /* INDEX */
+  html += `<section class="index"><div class="section-eyebrow mono">Índice por género</div><div class="idx-list">`;
+  GENRES.forEach((g,i)=>{
+    const c = SONGS.filter(s=>s[0]===g.key).length;
+    html += `<a class="idx-row" href="#g-${g.key}">
+      <div class="ix mono">${String(i+1).padStart(2,"0")}</div>
+      <div class="nm">${g.name}</div>
+      <div class="idx-dotfill"></div>
+      <div class="ct mono">${c} temas</div>
+    </a>`;
+  });
+  html += `</div></section>`;
+
+  /* GENRE SECTIONS */
+  GENRES.forEach((g,i)=>{
+    const list = SONGS.filter(s=>s[0]===g.key);
+    html += `<section class="genre" id="g-${g.key}">
+      <div class="genre-head">
+        <div class="genre-meta mono"><span>${String(i+1).padStart(2,"0")} / ${g.name}</span><span>${list.length} temas</span></div>
+        <h2 class="genre-title">${g.name}</h2>
+        <p class="genre-blurb">${g.blurb}</p>
+      </div>
+      <div class="tracklist">`;
+    list.forEach((s,j)=> html += trackRow(s, j+1));
+    html += `</div></section>`;
+  });
+
+  /* SETLIST PAGE */
+  html += `<section class="setpage" id="setlist">
+    <div class="section-eyebrow mono">Tu setlist · La Juerga</div>
+    <h2 class="genre-title" style="margin-bottom:24px">Tu selección</h2>
+    <div id="setBody"></div>
+  </section>`;
+
+  /* FOOTER */
+  html += `<div class="foot">
+    <span class="mk-light">${LOGO_NEGRO}</span>
+    <span class="mk-dark" style="display:none">${LOGO_BLANCO}</span>
+    <span>Música en vivo · ${new Date().getFullYear()}</span>
+  </div>`;
+
+  doc.innerHTML = html;
+  bindTracks();
+  renderSetlist();
+}
+
+function bindTracks(){
+  doc.querySelectorAll(".tracklist .track").forEach(el=>{
+    const toggle = ()=>{
+      const id = el.dataset.id;
+      if(selected.has(id)) selected.delete(id); else selected.add(id);
+      el.classList.toggle("sel");
+      el.setAttribute("aria-pressed", selected.has(id));
+      persist(); updateDock(); renderSetlist();
+    };
+    el.addEventListener("click", toggle);
+    el.addEventListener("keydown", e=>{ if(e.key===" "||e.key==="Enter"){e.preventDefault();toggle();} });
+  });
+}
+
+function selectedSongs(){ return SONGS.filter(s=>selected.has(songId(s))); }
+
+function renderSetlist(){
+  const body = document.getElementById("setBody");
+  if(!body) return;
+  const list = selectedSongs();
+  if(list.length===0){
+    body.innerHTML = `<div class="set-empty">Aún no has elegido canciones.<br>Toca los temas del catálogo y aparecerán aquí.</div>`;
+    return;
+  }
+  let h = `<div class="set-list">`;
+  list.forEach((s,i)=>{
+    h += `<div class="track sel" data-id="${songId(s)}" role="button" tabindex="0" title="Quitar">
+      <div class="t-num mono">${String(i+1).padStart(2,"0")}</div>
+      <div class="t-main"><div class="t-title">${s[1]}</div><div class="t-artist">${s[2]}</div></div>
+      <div class="t-tag mono">${s[3]}</div><div class="t-box">${CHECK}</div></div>`;
+  });
+  h += `</div>
+  <div class="set-foot">
+    <div><div class="lbl">Total seleccionado</div></div>
+    <div style="text-align:right"><div class="big">${list.length}</div><div class="lbl">canciones</div></div>
+  </div>
+  <div class="sign">
+    <div class="field"><span>Cliente / evento</span></div>
+    <div class="field"><span>Fecha del evento</span></div>
+  </div>`;
+  body.innerHTML = h;
+  body.querySelectorAll(".track").forEach(el=>{
+    el.style.cursor="pointer";
+    const rm = ()=>{
+      const id=el.dataset.id; selected.delete(id);
+      const row=doc.querySelector(`.tracklist .track[data-id="${id}"]`);
+      if(row){ row.classList.remove("sel"); row.setAttribute("aria-pressed","false"); }
+      persist(); updateDock(); renderSetlist();
+    };
+    el.addEventListener("click", rm);
+    el.addEventListener("keydown", e=>{ if(e.key===" "||e.key==="Enter"){e.preventDefault();rm();} });
+  });
+}
+
+/* ====== DOCK ====== */
+const dock = document.getElementById("dock");
+function updateDock(){
+  const n = selected.size;
+  document.getElementById("dCount").textContent = n;
+  document.getElementById("dBar").style.width = (n/total*100)+"%";
+  dock.classList.toggle("hidden", n===0);
+  document.getElementById("dSend").disabled = n===0;
+}
+function persist(){ /* sin localStorage — compatible con Safari local */ }
+
+document.getElementById("dView").addEventListener("click",()=>{
+  document.getElementById("setlist").scrollIntoView({behavior:"smooth"});
+});
+document.getElementById("dClear").addEventListener("click",()=>{
+  if(selected.size && confirm("¿Quitar todas las canciones de tu setlist?")){
+    selected.clear(); persist(); updateDock();
+    doc.querySelectorAll(".track.sel").forEach(t=>{ t.classList.remove("sel"); t.setAttribute("aria-pressed","false"); });
+    renderSetlist();
+  }
+});
+
+/* ====== EXPORT ====== */
+const modal = document.getElementById("modal");
+document.getElementById("dSend").addEventListener("click",()=>{
+  if(selected.size===0) return;
+  document.getElementById("mCount").textContent = selected.size;
+  modal.classList.add("open");
+});
+document.getElementById("mClose").addEventListener("click",()=>modal.classList.remove("open"));
+modal.addEventListener("click",e=>{ if(e.target===modal) modal.classList.remove("open"); });
+
+function buildMessage(){
+  const list = selectedSongs();
+  let t = `🎵 Mi setlist para La Juerga (${list.length} canciones)\n\n`;
+  let cur = "";
+  list.forEach(s=>{
+    const g = GENRES.find(x=>x.key===s[0]).name;
+    if(g!==cur){ t += `\n— ${g.toUpperCase()} —\n`; cur=g; }
+    t += `• ${s[1]} — ${s[2]}\n`;
+  });
+  t += `\n¡Listos para la fiesta! 🎉`;
+  return t;
+}
+
+document.getElementById("mWa").addEventListener("click",()=>{
+  const txt = encodeURIComponent(buildMessage());
+  const url = BAND_PHONE
+    ? `https://wa.me/${BAND_PHONE}?text=${txt}`
+    : `https://wa.me/?text=${txt}`;
+  window.open(url,"_blank");
+});
+document.getElementById("mCopy").addEventListener("click",async()=>{
+  try{ await navigator.clipboard.writeText(buildMessage()); showToast("Lista copiada al portapapeles"); }
+  catch(e){ showToast("No se pudo copiar — intenta manualmente"); }
+});
+document.getElementById("mPrint").addEventListener("click",()=>{
+  modal.classList.remove("open");
+  document.getElementById("setlist").scrollIntoView();
+  setTimeout(()=>window.print(), 350);
+});
+
+/* ====== TOAST ====== */
+let toastT;
+function showToast(msg){
+  const el = document.getElementById("toast");
+  el.textContent = msg; el.classList.add("show");
+  clearTimeout(toastT); toastT = setTimeout(()=>el.classList.remove("show"), 2400);
+}
+
+/* ====== THEME ====== */
+function applyTheme(t){
+  document.documentElement.setAttribute("data-theme", t);
+  const dark = t==="dark";
+  document.querySelectorAll(".mk-light").forEach(e=>e.style.display=dark?"none":"");
+  document.querySelectorAll(".mk-dark").forEach(e=>e.style.display=dark?"":"none");
+  document.getElementById("themeLabel").textContent = dark?"Fondo blanco":"Fondo negro";
+  try{ localStorage.setItem("lajuerga_theme", t); }catch(e){}
+}
+document.getElementById("themeBtn").addEventListener("click",()=>{
+  applyTheme(document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark");
+});
+document.getElementById("printBtn").addEventListener("click",()=>window.print());
+
+/* ====== INIT ====== */
+build();
+updateDock();
+try{ applyTheme(localStorage.getItem("lajuerga_theme")||"light"); }catch(e){ applyTheme("light"); }
+</script>
+</body>
+</html>
